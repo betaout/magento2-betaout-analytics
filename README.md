@@ -53,7 +53,7 @@ To start tracking, set *Enable Tracking* to *Yes*, enter the
 Disclaimer
 ----------
 
-Henhed_Piwik is distributed in the hope that it will be useful, but
+Betaout_Analytics is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the [GNU
 Affero General Public License][agpl] for more details.
