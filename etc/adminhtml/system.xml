@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright 2016 Betaout
+ *
+ * This file is part of Betaout_Analytics
+ *
+ * Henhed_Piwik is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Betaout_Analytics is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Henhed_Piwik.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="betaout"
+                 translate="label"
+                 type="text"
+                 sortOrder="360"
+                 showInDefault="1"
+                 showInWebsite="1"
+                 showInStore="1">
+            <label>Betaout Analytics</label>
+            <tab>sales</tab>
+            <resource>Betaout_Analytics::betaout</resource>
+            <group id="analytics"
+                   translate="label"
+                   type="text"
+                   sortOrder="10"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>Beatout Analytics</label>
+                <field id="betaout_enabled"
+                       translate="label"
+                       type="select"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Enable Tracking</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                 <field id="betaout_apikey"
+                       translate="label comment"
+                       type="text"
+                       sortOrder="30"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>API Key</label>
+                    <comment>Listed under IDEAS and DOCS/ApiKey in Betaout  panel</comment>
+                     <frontend_class>required-entry</frontend_class>
+                </field>
+                <field id="betaout_projectid"
+                       translate="label comment"
+                       type="text"
+                       sortOrder="40"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Project ID</label>
+                    <comment>Listed under  IDEAS and DOCS/ApiKey in your Betaout  panel</comment>
+                    <frontend_class>required-entry</frontend_class>
+                </field>
+               
+            </group>
+        </section>
+    </system>
+</config>

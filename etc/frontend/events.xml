@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright 2016 Betaout Analytics
+ *
+ * This file is part of Betaout_Analytics.
+ *
+ * Henhed_Piwik is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Betaout_Analytics is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Betaout_Analytics.  If not, see <http://www.gnu.org/licenses/>.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_controller_product_view">
+        <observer name="betaout_observer"
+                  instance="Betaout\Analytics\Observer\ProductViewObserver" />
+    </event>
+    <event name="checkout_cart_product_add_after">
+        <observer name="betaout_observer"
+                  instance="Betaout\Analytics\Observer\ProductAddCartObserver" />
+    </event>
+    <event name="checkout_cart_update_items_after">
+         <observer name="betaout_observer"
+                  instance="Betaout\Analytics\Observer\ProductUpdateCartObserver" />
+    </event>
+    <event name="sales_quote_remove_item">
+         <observer name="betaout_observer"
+                  instance="Betaout\Analytics\Observer\ProductRemoveCartObserver" />
+    </event>
+    <event name="checkout_onepage_controller_success_action">
+        <observer name="betaout_observer"
+                  instance="Betaout\Analytics\Observer\CheckoutSuccessObserver" />
+    </event>
+    <event name="multishipping_checkout_controller_success_action">
+        <observer name="betaout_observer"
+                  instance="Betaout\Analytics\Observer\CheckoutSuccessObserver" />
+    </event>
+</config>
