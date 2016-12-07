@@ -164,7 +164,7 @@ class CheckoutSuccessObserver implements ObserverInterface
                 'products' => $betaoutItems,
                 'order_info' => $betaoutOrder,
             );
-           mail("rohit@getamplify.com", "magento 20 purchase data",  json_encode($actionDescription) );
+          
            $result=$this->_betaoutTracker->customer_action($actionDescription);
         }
 

@@ -76,7 +76,7 @@ class ProductAddCartObserver implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         try{
-         //mail("rohit@getamplify.com", "magento 20", "add_to_cart");
+        
          $product = $observer->getEvent()->getProduct();
          $catCollection = $product->getCategoryCollection();
          $categs = $catCollection->exportToArray();
@@ -123,10 +123,10 @@ class ProductAddCartObserver implements ObserverInterface
              "products" => $actionData,
              "cart_info"=>$cartInfo
          );
-         mail("rohit@getamplify.com", "magento 20 add_to_cart_data",  json_encode($actionDescription)); 
+       
          $this->_betaoutTracker->customer_action($actionDescription);
         }catch(Exception $ex){
-           mail("rohit@getamplify.com", "magento 20 error", "add_to_cart"); 
+          
         }
     }
     

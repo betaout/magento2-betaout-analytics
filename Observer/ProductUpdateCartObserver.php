@@ -74,7 +74,7 @@ class ProductUpdateCartObserver implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
      try{
-         mail("rohit@getamplify.com", "magento 20", "update_cart");
+        
          $subdiff=0;
         $actionData = array();
         $cartInfo=array();
@@ -109,10 +109,10 @@ class ProductUpdateCartObserver implements ObserverInterface
             "products" => $actionData,
             "cart_info"=>$cartInfo
             );
-         mail("rohit@getamplify.com", "magento 20 update_cart_data",  json_encode($actionDescription)); 
+        
         $this->_betaoutTracker->customer_action($actionDescription);
         }catch(Exception $ex){
-           mail("rohit@getamplify.com", "magento 20 update_cart_eror","errrr");   
+         
         }
     }
 }
