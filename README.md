@@ -55,21 +55,21 @@ Description
 #Betaout, All-­in-­One eCommerce Marketing Software
 
 Your customer is engaging with you via multiple channels including your website, mobile, app, email, sms, social networks etc, and to facilitate communication with your customer across different channels, you are using a standalone software. So, instead of getting your data trapped in 3-4 different silos, Beatout offers all-in-one marketing automation software with a centralized database. It combines customer segmentation, email marketing, on-site engagement, and marketing analytics together as one. Our powerful marketing solution helps you to harness and leverage your customer data collected across multiple channels and touchpoints to boost conversion and retention.
-#1 The complete Email marketing solution
+* The complete Email marketing solution
 
 With the email marketing feature you can set up data driven email campaigns, including welcome emails, activation emails, win back and retention emails.You can create and send beautiful newsletters with WYSIWYG editor. One can set-up lifecycle emails, behavioral emails and advanced triggered campaigns with zero technical knowledge. This helps in list management such as Unsubscribes, Spam and Bounce.The powerful analytics goes beyond opens and clicks which helps the user to have a real-time detailed report.This gives a complete view of every campaign you have send with actionable stats. It also optimizes deliverability with send at best time feature.
-#Customer Segmentation
+*Customer Segmentation
 
 In this feature you can segment your customer base based on real-time data. The advanced segmentation is based on all attributes, demographics, customer lifecycle, customer behavior, and purchase activity.You can create refined segments on the fly, no coding is required.
 
 The segments are based on RFM metrics (Recency, Frequency, Monetary Value) which gives a detailed & real-time segment insight by which you get automatic segment growth reports. This also helps in exporting segmented lists into CSV format.
-#360 Customer Profiles
+*360 Customer Profiles
 
 An insight to a single view of customer profile with demographic details, events & activity details across multiple touch point.
-#Cart Abandonment
+*Cart Abandonment
 
 Cart Abandonment feature helps to trigger multi-step abandoned cart reminders. You can personalize the message based on the targeted segment by inserting dynamic content and adding product information. This feature gives a detailed analytics on recovered revenue.
-#On­-site engagement
+*On­-site engagement
 
 This feature proactively initiates on-page chat with your visitors. One can have a private inbox for every team member. It helps you to create pullup tab, sticky bar and other notifications in a visual editor. Using this feature you can set-up advanced trigger rules to show light box. You can set-up real-time notifications when customer is on your website.
 Marketing templates and recipes
@@ -89,6 +89,11 @@ Checkout a working demo at www.betaout.com, or schedule a live demo by emailing 
 Documentation
 
 Installation Manual Link https://www.betaout.com/ideas/product-guide
+
+Screen
+----------
+
+![Profile](https://www.magentocommerce.com/magento-connect/media/catalog/product/cache/9/thumbnail/99x74/9df78eab33525d08d6e5fb8d27136e95/p/r/profile-permalink_1.png"Profile")
 
 Disclaimer
 ----------
