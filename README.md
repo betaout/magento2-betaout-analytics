@@ -93,6 +93,23 @@ Documentation
 
 Installation Manual Link https://www.betaout.com/ideas/product-guide
 
+Screens
+----------
+* **Home**
+
+ ![Betaout home](http://betaout.s3.amazonaws.com/BO/rohit/home_2__1.png)
+
+* **Profile**
+
+  ![Betaout profile](http://betaout.s3.amazonaws.com/BO/rohit/profile-permalink_1.png)
+
+* **lifecycle**
+
+  ![Betaout lifecucle](http://betaout.s3.amazonaws.com/BO/rohit/lifecycles_1__1.png)
+
+* **Ideas**
+
+  ![Betaout ideas](http://betaout.s3.amazonaws.com/BO/rohit/ideas_1__1.png)
 
 Disclaimer
 ----------
