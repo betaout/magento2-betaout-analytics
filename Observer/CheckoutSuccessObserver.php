@@ -123,7 +123,7 @@ class CheckoutSuccessObserver implements ObserverInterface
                    }
                 }
                $sku   = $item->getSku();
-                $id   = $item->getId();
+                $id   = $item->getProductId();
                 $name  = $item->getName();
                 $price = (float) $item->getBasePriceInclTax();
                 $qty   = (float) $item->getQtyOrdered();
