@@ -97,7 +97,7 @@ public function sendData($data) {
                     $actionData[$i]['price'] = $product->getPrice();
                     $actionData[$i]['currency'] =$this->_storeManager->getStore()->getCurrentCurrencyCode();
                    
-                    $actionData[$i]['image_url'] = $product->getImageUrl();
+                    $actionData[$i]['image_url'] = $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)."catalog/product".$product->getImage();
                     $actionData[$i]['product_url'] = $product->getProductUrl();
                     $actionData[$i]['brandname'] = $product->getResource()->getAttribute('manufacturer') ? $product->getAttributeText('manufacturer') : false;
                     $actionData[$i]['quantity'] = (int) $item->getQtyOrdered();
