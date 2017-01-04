@@ -44,41 +44,42 @@ public function sendData($data){
         try {
             $limit = isset($_GET['limit']) ? $_GET['limit'] : "5";
             $cpage = isset($_GET['pageNo']) ? $_GET['pageNo'] : 1;
-            $products =$this->_productCollectionFactory->getCollection()
-                    ->addAttributeToSelect('*') // select all attributes
-                    ->setPageSize($limit); // limit number of results returned
+            $products =$this->_productCollectionFactory->create()
+                    ->addAttributeToSelect('*')
+                    ->setPageSize($limit);
            $lpages = $products->getLastPageNumber();
            $products->setCurPage($cpage); // set the offset (useful for pagination)
-         
-            $productData = array();
+           $productData = array();
             $i = 0;
-// we iterate through the list of products to get attribute values
             foreach ($products as $product) {
                 $productData[$i]['name'] = $product->getName(); //get name
                 $productData[$i]['price'] = (float) $product->getPrice(); //get price as cast to float
                 $productData[$i]['id'] = $product->getId();
                 $productData[$i]['sku'] = $product->getSku();
-                $productData[$i]['currency'] = Mage::app()->getStore()->getBaseCurrencyCode();
-                $productData[$i]['image_url'] = $product->getImageUrl();
+                $productData[$i]['currency'] = $this->_storeManager->getStore()->getCurrentCurrencyCode();
+                $productData[$i]['image_url'] = $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)."catalog/product".$product->getImage();
                 $productData[$i]['product_url'] = $product->getProductUrl();
                 $productData[$i]['brandname'] = $product->getResource()->getAttribute('manufacturer') ? $product->getAttributeText('manufacturer') : false;
                 $categories = array();
-                $categoryIds = $product->getCategoryIds();
-                // getCategoryIds(); returns an array of category IDs associated with the product
-                foreach ($categoryIds as $category_id) {
-                    $cateName = Mage::getModel('catalog/category')->load($category_id['entity_id']);
-                    $name = $cateName->getName();
-                    $id = $cateName->getEntityId();
-                    $pid = $cateName->getParent_id();
-                    if ($pid == 1) {
-                        $pid = 0;
-                    }
-                    $categories[] = array("cat_id" => $id, "cat_name" => $name, "parent_cat_id" => $pid);
-                }
-                $productData[$i]['categories'] = $categories;
+                $catCollection = $product->getCategoryCollection();
+                $categs = $catCollection->exportToArray();
+
+                     $cateHolder = array();
+                     foreach ($categs as $cat) {
+                       $category = $this->_categoryFactory->create()->load($cat['entity_id']);
+                       $name =$category->getName();
+                       $id = $category->getEntityId();
+                        $pid = $category->getParentId();
+                       if ($pid == 1) {
+                           $pid = 0;
+                        }
+                        if(!empty($name)){
+                          $cateHolder[] = array("cat_id"=>$id,"cat_name" => $name, "parent_cat_id" => $pid);
+                        }
+                     }
+                $productData[$i]['categories'] = $cateHolder;
                 $i++;
             }
-           
        $send = isset($_GET['send']) ? $_GET['send'] : "1";
         if($send){
          self::sendData($productData);
@@ -86,10 +87,9 @@ public function sendData($data){
         }else{
          $result=array("lastPage"=>$lpages,"cpage"=>$cpage,"responseCode"=>200,'data'=>$productData);  
         }
-//       self::sendData($productData);
-//       $result=array("lastPage"=>$lpages,"cpage"=>$cpage,"responseCode"=>200);
+        echo json_encode($result);
         } catch (Exception $ex) {
-            
+            print_r($ex);
         }
     }
 
