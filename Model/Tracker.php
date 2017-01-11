@@ -250,7 +250,7 @@ class Tracker {
                 } else
                     $this->makeParams();
                 $paramdata=$this->getParams();
-               mail("rohit@getamplify.com","local response",$paramdata);
+               //mail("rohit@getamplify.com","local response",$paramdata);
                return $this->makeRequest($requestUrl,$paramdata);
             } catch (Exception $ex) {
                 $this->showError[] = $ex->getCode() . ":" . $ex->getMessage();
@@ -277,7 +277,7 @@ class Tracker {
         }
         curl_close($ch);
         $resultData = json_decode($result, true);
-        mail("rohit@getamplify.com","local response",$result);
+        //mail("rohit@getamplify.com","local response",$result);
         return $resultData;
         } catch (Exception $ex) {
             
