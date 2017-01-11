@@ -44,13 +44,23 @@ public function sendData($data){
         try {
             $limit = isset($_GET['limit']) ? $_GET['limit'] : "5";
             $cpage = isset($_GET['pageNo']) ? $_GET['pageNo'] : 1;
+            $totalCount = isset($_GET['totalCount']) ? $_GET['totalCount'] : 0;
+            if($totalCount){
+            $products =$this->_productCollectionFactory->create()
+                    ->addAttributeToSelect('*');
+            $count=$products->Count();
+            $result=array("total"=>$count,"cpage"=>0,"responseCode"=>200); 
+            echo json_encode($result);
+            }else{
             $products =$this->_productCollectionFactory->create()
                     ->addAttributeToSelect('*')
                     ->setPageSize($limit);
-           $lpages = $products->getLastPageNumber();
-           $products->setCurPage($cpage); // set the offset (useful for pagination)
-           $productData = array();
+            $lpages = $products->getLastPageNumber();
+            $products->setCurPage($cpage); // set the offset (useful for pagination)
+             $count=$products->Count();
+            $productData = array();
             $i = 0;
+            if($count){
             foreach ($products as $product) {
                 $productData[$i]['name'] = $product->getName(); //get name
                 $productData[$i]['price'] = (float) $product->getPrice(); //get price as cast to float
@@ -80,14 +90,19 @@ public function sendData($data){
                 $productData[$i]['categories'] = $cateHolder;
                 $i++;
             }
-       $send = isset($_GET['send']) ? $_GET['send'] : "1";
-        if($send){
-         self::sendData($productData);
-          $result=array("lastPage"=>$lpages,"cpage"=>$cpage,"responseCode"=>200);
-        }else{
-         $result=array("lastPage"=>$lpages,"cpage"=>$cpage,"responseCode"=>200,'data'=>$productData);  
-        }
-        echo json_encode($result);
+            $send = isset($_GET['send']) ? $_GET['send'] : "1";
+            if($send){
+              self::sendData($productData);
+               $result=array("lastPage"=>$lpages,"cpage"=>$cpage,"responseCode"=>200);
+            }else{
+              $result=array("lastPage"=>$lpages,"cpage"=>$cpage,"responseCode"=>200,'data'=>$productData);  
+            }
+             echo json_encode($result);
+            }else{
+                  $result=array("lastPage"=>0,"cpage"=>0,"responseCode"=>400,'data'=>"No Data found");  
+                 echo json_encode($result);
+            }
+            }
         } catch (Exception $ex) {
             print_r($ex);
         }

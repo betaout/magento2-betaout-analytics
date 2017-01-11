@@ -43,11 +43,22 @@ public function sendData($data) {
    public function execute()
     {
     try{
-    $status=isset($_GET['status'])?$_GET['status']:"";
+    $status=isset($_GET['status'])?$_GET['status']:"complete";
     $cpage=isset($_GET['pageNo'])?$_GET['pageNo']:1;
-   $orders =$this->_orderCollectionFactory->create()
+    $limit = isset($_GET['limit']) ? $_GET['limit'] : 50;
+    $totalCount = isset($_GET['totalCount']) ? $_GET['totalCount'] : 0;
+    if($totalCount){
+     $orders =$this->_orderCollectionFactory->create()
          ->addFieldToSelect('*')
-         ->setPageSize(10);
+         ->addFieldToFilter('status',$status);
+      $count=$orders->Count();
+      $result=array("total"=>$count,"cpage"=>0,"responseCode"=>200);  
+     echo json_encode($result);
+    }else{
+    $orders =$this->_orderCollectionFactory->create()
+         ->addFieldToSelect('*')
+         ->addFieldToFilter('status',$status) 
+         ->setPageSize($limit);
      $lpages = $orders->getLastPageNumber();
      $orders->setCurPage($cpage);
  $count=$orders->Count();
@@ -55,8 +66,8 @@ public function sendData($data) {
  $j=0;
   if($count){
        foreach ($orders as $order)  {
+          
                 $orderId = $order->getId();
-                //$order = Mage::getModel("sales/order")->load($orderId);
                 $order_id = $order->getIncrementId();
                 $email=  $order->getData('customer_email');
                 $data=array();
@@ -95,8 +106,7 @@ public function sendData($data) {
                     $actionData[$i]['name'] = $product->getName();
                     $actionData[$i]['sku'] = $product->getSku();
                     $actionData[$i]['price'] = $product->getPrice();
-                    $actionData[$i]['currency'] =$this->_storeManager->getStore()->getCurrentCurrencyCode();
-                   
+                    $actionData[$i]['currency'] =$this->_storeManager->getStore()->getCurrentCurrency()->getCode();
                     $actionData[$i]['image_url'] = $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)."catalog/product".$product->getImage();
                     $actionData[$i]['product_url'] = $product->getProductUrl();
                     $actionData[$i]['brandname'] = $product->getResource()->getAttribute('manufacturer') ? $product->getAttributeText('manufacturer') : false;
@@ -107,20 +117,20 @@ public function sendData($data) {
                 }
 
               
-                $TotalPrice = $order->getBaseGrandTotal();
-                $totalShippingPrice = $order->getBaseShippingInclTax();
+                $TotalPrice = $order->getGrandTotal();
+                $totalShippingPrice = $order->getShippingInclTax();
              
-                $subTotalPrice = $order->getBaseSubtotal();
-                $orderInfo["revenue"] = $subTotalPrice - abs($order->getBaseDiscountAmount());
+                $subTotalPrice = $order->getSubtotal();
+                $orderInfo["revenue"] = $subTotalPrice - abs($order->getDiscountAmount());
                 $orderInfo["total_price"] = $TotalPrice;
                 $orderInfo["shipping_price"] = $totalShippingPrice;
                 $orderInfo['order_id'] = $order->getIncrementId();
-                $orderInfo['promo_code'] = $order->getBaseCouponCode();
+                $orderInfo['promo_code'] = $order->getCouponCode();
                 $orderInfo['discount'] = abs($order->getDiscountAmount());
-                $orderInfo['currency'] = $order->getBaseOrderCurrencyCode();
-                $orderInfo['order_status'] = 'completed';
-                $orderInfo['taxes'] = $order->getBaseShippingTaxAmount();
-                $orderInfo['payment_method']="Custom";  
+                $orderInfo['currency'] = $order->getOrderCurrencyCode();
+                $orderInfo['order_status'] = $status;
+                $orderInfo['taxes'] = $order->getShippingTaxAmount();
+                $orderInfo['payment_method']= $order->getPayment()->getMethodInstance()->getTitle();;  
                 $orderInfo['products']=$actionData; 
                 $orderInfo['created_time']=strtotime($order->getData('created_at'));
                 
@@ -135,16 +145,16 @@ public function sendData($data) {
         $send = isset($_GET['send']) ? $_GET['send'] : "1";
         if($send){
          self::sendData($ordata);
-          $result=array("lastPage"=>$lpages,"cpage"=>$cpage,"responseCode"=>200);
+         $result=array("lastPage"=>$lpages,"cpage"=>$cpage,"responseCode"=>200);
         }else{
          $result=array("lastPage"=>$lpages,"cpage"=>$cpage,"responseCode"=>200,'data'=>$ordata);  
         }
-//        self::sendData($ordata);
-//        $result=array("lastPage"=>$lpages,"cpage"=>$cpage,"responseCode"=>200);
         echo json_encode($result);
       }else{
-          
+          $result=array("lastPage"=>0,"cpage"=>0,"responseCode"=>400,'data'=>"No Data found");  
+          echo json_encode($result);
       }
+    }
         
    }catch(Exception $e){
        echo json_encode(array("error"=>$e->getMessage()));

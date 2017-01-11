@@ -47,6 +47,14 @@ class Customer extends \Magento\Framework\App\Action\Action {
     public function execute() {
         $limit = isset($_GET['limit']) ? $_GET['limit'] : "5";
         $cpage = isset($_GET['pageNo']) ? $_GET['pageNo'] : 1;
+        $totalCount = isset($_GET['totalCount']) ? $_GET['totalCount'] : 0;
+        if($totalCount){
+        $collection = $this->_customerCollectionFactory->create()
+                ->addAttributeToSelect('*');
+        $count=$collection->Count();
+        $result=array("total"=>$count,"cpage"=>0,"responseCode"=>200); 
+        echo json_encode($result);
+        }else{
         $collection = $this->_customerCollectionFactory->create()
                 ->addAttributeToSelect('*')
                 ->joinAttribute('shipping_firstname', 'customer_address/firstname', 'default_shipping', null, 'left')
@@ -61,11 +69,11 @@ class Customer extends \Magento\Framework\App\Action\Action {
 
         $collection->setPageSize($limit);
         $lpages = $collection->getLastPageNumber();
-
+        $count=$collection->Count();
         $collection->setCurPage($cpage);
         $customerData = array();
         $i = 0;
-        // we iterate through the list of products to get attribute values
+        if($count){
         foreach ($collection as $customer) {
             $customerArray = $customer->toArray();
             $customerData[$i]['identifiers']['email']=$customerArray['email'];
@@ -83,13 +91,18 @@ class Customer extends \Magento\Framework\App\Action\Action {
         }
         $send = isset($_GET['send']) ? $_GET['send'] : "1";
         if($send){
-         self::sendData($customerData);
+          self::sendData($customerData);
           $result=array("lastPage"=>$lpages,"cpage"=>$cpage,"responseCode"=>200);
         }else{
          $result=array("lastPage"=>$lpages,"cpage"=>$cpage,"responseCode"=>200,'data'=>$customerData);  
         }
+        }else{
+          $result=array("lastPage"=>0,"cpage"=>0,"responseCode"=>400,'msg'=>"No Data Found");  
+          echo json_encode($result);
+        }
        
         echo json_encode($result);
+       }
     }
 
 }
