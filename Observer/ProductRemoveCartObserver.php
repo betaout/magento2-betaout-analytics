@@ -77,16 +77,13 @@ class ProductRemoveCartObserver implements ObserverInterface
         $product = $observer->getEvent()->getQuote_item();
         $actionData = array();
         $cartInfo=array();
-        $actionData[0]['id'] = $product->getId();
+        $actionData[0]['id'] = $product->getProductId();
         $actionData[0]['name'] = $product->getName();
         $actionData[0]['sku'] = $product->getSku();
-        $actionData[0]['price'] = $product->getFinalPrice();
+        $actionData[0]['price'] = $product->getPrice();
         $actionData[0]['currency'] = $this->_storeManager->getStore()->getCurrentCurrencyCode();
-        $actionData[0]['image_url'] = $this->_dataHelper->getMediaBaseUrl().$product->getImage();
-        $actionData[0]['product_url'] = $product->getProductUrl(); 
         $actionData[0]['quantity']=$product->getQty();
-        $subprice = (float) $product->getQty() * $product->getFinalPrice();
-        
+        $subprice = (float) $product->getQty() * $product->getPrice();
         $userdata=$this->_dataHelper->getCustomerIdentity();
         $quote = $this->_checkoutSession->getQuote();
         $cartInfo['total']=(float) $quote->getBaseGrandTotal()- $subprice;

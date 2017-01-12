@@ -83,13 +83,11 @@ class ProductUpdateCartObserver implements ObserverInterface
       
         /* @var $product \Magento\Catalog\Model\Product */
             if($product->hasDataChanges()) {
-             $actionData[$i]['id'] = $product->getId();
+             $actionData[$i]['id'] = $product->getProductId();
              $actionData[$i]['name'] = $product->getName();
              $actionData[$i]['sku'] = $product->getSku();
              $actionData[$i]['price'] = $product->getPrice();
              $actionData[$i]['currency'] = $this->_storeManager->getStore()->getCurrentCurrencyCode();
-             $actionData[$i]['image_url'] = $this->_dataHelper->getMediaBaseUrl().$product->getImage();
-             $actionData[$i]['product_url'] = $product->getProductUrl();
              $actionData[$i]['quantity']=$product->getQty();
              $oldQty = (int) $product->getOrigData('qty');
              $newQty = (int) $product->getQty();
