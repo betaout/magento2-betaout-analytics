@@ -133,7 +133,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      public function setCookies($data){
           $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
           $cookieManager = $objectManager->get('Magento\Framework\Stdlib\CookieManagerInterface');
-          $cookieManager->setPublicCookie('_ampUSER', base64_encode($data));
+          $cookieMetadataFactory=$objectManager->get('Magento\Framework\Stdlib\Cookie\CookieMetadataFactory');
+          $sessionManager=$objectManager->get('Magento\Framework\Session\SessionManagerInterface');
+          $metadata = $cookieMetadataFactory
+          ->createPublicCookieMetadata()
+          ->setDuration("86400")
+          ->setPath($sessionManager->getCookiePath())
+          ->setDomain($sessionManager->getCookieDomain());
+          $cookieManager->setPublicCookie('_ampUSER', base64_encode($data),$metadata);
          
      }
 }
