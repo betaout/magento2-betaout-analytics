@@ -100,6 +100,7 @@ class CheckoutSuccessObserver implements ObserverInterface
         // register one `trackEcommerceOrder' per request. (For multishipping)
         $betaoutOrder = [];
         $i=0;
+        $data=array();
         foreach ($collection as $order) {
             $billingAddress=$order->getShippingAddress();
             if (is_object($billingAddress)) {
@@ -176,10 +177,10 @@ class CheckoutSuccessObserver implements ObserverInterface
         // Push `trackEcommerceOrder'
         if (!empty($betaoutOrder)) {
 
-           $userdata=$this->_dataHelper->getCustomerIdentity();
+          // $userdata=$this->_dataHelper->getCustomerIdentity();
             $actionDescription = array(
                 'activity_type' => 'purchase',
-                "identifiers" =>$userdata,
+                "identifiers" =>$data,
                 'products' => $betaoutItems,
                 'order_info' => $betaoutOrder,
             );
