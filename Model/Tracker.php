@@ -293,12 +293,17 @@ class Tracker {
     public function identify($data = array()) {
           $cdata=array();
           $cdata= $this->_dataHelper->getCustomerIdentity();
+          $identifiers=array();
+          if(is_array($cdata)){
           $identifiers['identifiers']= array_merge($cdata,$data);
+          }else{
+           $identifiers['identifiers']=$data;
+          }
          
          $response = $this->http_call('identify', $identifiers);
            if(isset($identifiers['identifiers'])){
                $jdata= json_encode($identifiers['identifiers']);
-               $this->_dataHelper->setCookes($jdata);
+               $this->_dataHelper->setCookies($jdata);
            }
          return $response;
     }

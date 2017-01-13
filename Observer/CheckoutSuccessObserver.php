@@ -101,7 +101,26 @@ class CheckoutSuccessObserver implements ObserverInterface
         $betaoutOrder = [];
         $i=0;
         foreach ($collection as $order) {
-            $billingAddress=$order->getBillingAddress();
+            $billingAddress=$order->getShippingAddress();
+            if (is_object($billingAddress)) {
+                       $data['email']=$billingAddress->getEmail();
+                       $data['phone'] = $billingAddress->getTelephone();
+                       $data['customer_id'] = $billingAddress->getCustomerId();
+                       $person['firstname'] = $billingAddress->getFirstname();
+                       $person['lastname'] = $billingAddress->getLastname();
+                       $person['postcode'] = $billingAddress->getPostcode();
+                       $person['fax'] = $billingAddress->getfax();
+                       $person['company'] = $billingAddress->getCompany();
+                       $person['street'] = $billingAddress->getStreetFull();
+                       try {
+                        $data=  array_filter($data);
+                        $result=$this->_betaoutTracker->identify($data);
+                         } catch (Exception $ex) {
+                         }
+                      $person = array_filter($person);
+                      $properties['update']=$person;
+                    $result = $this->_betaoutTracker->userProperties($data, $properties);
+                }
             /* @var $order \Magento\Sales\Model\Order */
             foreach ($order->getAllVisibleItems() as $item) {
                 /* @var $item \Magento\Sales\Model\Order\Item */
