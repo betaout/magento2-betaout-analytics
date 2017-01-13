@@ -110,6 +110,7 @@ class CheckoutSuccessObserver implements ObserverInterface
                        $person['firstname'] = $billingAddress->getFirstname();
                        $person['lastname'] = $billingAddress->getLastname();
                        $person['postcode'] = $billingAddress->getPostcode();
+                       $person['city'] = $billingAddress->getCity();
                        $person['fax'] = $billingAddress->getfax();
                        $person['company'] = $billingAddress->getCompany();
                        $person['street'] = $billingAddress->getStreetFull();
