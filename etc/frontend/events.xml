@@ -45,4 +45,12 @@
         <observer name="betaout_observer"
                   instance="Betaout\Analytics\Observer\CheckoutSuccessObserver" />
     </event>
+    <event name="customer_login">
+        <observer name="betaout_observer"
+                  instance="Betaout\Analytics\Observer\CustomerLogin" />
+    </event>
+    <event name="customer_register_success">
+        <observer name="betaout_observer"
+                  instance="Betaout\Analytics\Observer\CustomerRegister" />
+    </event>
 </config>
