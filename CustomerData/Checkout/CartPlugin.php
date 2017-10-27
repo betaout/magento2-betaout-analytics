@@ -86,14 +86,6 @@ class CartPlugin
         \Magento\Checkout\CustomerData\Cart $subject,
         $result
     ) {
-//        if ($this->_dataHelper->isTrackingEnabled()) {
-//            $quote = $this->_checkoutSession->getQuote();
-//            if ($quote->getId()) {
-//                $tracker = $this->_trackerFactory->create();
-//                $this->_trackerHelper->addQuote($quote, $tracker);
-//                $result['betaoutActions'] = $tracker->toArray();
-//            }
-//        }
         return $result;
     }
 }

@@ -23,7 +23,7 @@ namespace Betaout\Analytics\Helper;
 use Magento\Store\Model\Store;
 
 /**
- * BEtaout data helper
+ * Betaout data helper
  *
  */
 class Data extends \Magento\Framework\App\Helper\AbstractHelper

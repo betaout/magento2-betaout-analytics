@@ -5,7 +5,7 @@
  *
  * This file is part of Betaout_Analytics
  *
- * Henhed_Piwik is free software: you can redistribute it and/or modify
+ * Betaout_Analytics is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -16,7 +16,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with Henhed_Piwik.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Betaout_Analytics.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -39,7 +39,7 @@
                    showInDefault="1"
                    showInWebsite="1"
                    showInStore="1">
-                <label>Beatout Analytics</label>
+                <label>Betaout Analytics</label>
                 <field id="betaout_enabled"
                        translate="label"
                        type="select"

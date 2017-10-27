@@ -70,6 +70,7 @@ class ProductViewObserver implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         try{
+           
         $product = $observer->getEvent()->getProduct();
         /* @var $product \Magento\Catalog\Model\Product */
         $actionData = array();
@@ -81,12 +82,16 @@ class ProductViewObserver implements ObserverInterface
         $actionData[0]['image_url'] =$this->_dataHelper->getMediaBaseUrl().$product->getImage();
         $actionData[0]['product_url'] =$product->getProductUrl(); 
         $userdata=$this->_dataHelper->getCustomerIdentity();
+        if($actionData[0]['price']==0){
+            $actionData[0]['price']=0.001;
+        }
         $actionDescription = array(
             'activity_type' => 'view',
             "identifiers" =>$userdata,
             'products' => $actionData
         );
         $this->_betaoutTracker->customer_action($actionDescription);
+       
         }catch(Exception $ex){
             
         }

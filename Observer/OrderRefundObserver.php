@@ -21,13 +21,12 @@
 namespace Betaout\Analytics\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\Phrase;
 /**
  * Observer for `controller_action_predispatch_checkout_cart_index'
  *
  * @link https://app.betaout.com/http-api.html
  */
-class CheckoutSuccessObserver implements ObserverInterface
+class OrderRefundObserver implements ObserverInterface
 {
 
     /**
@@ -84,28 +83,22 @@ class CheckoutSuccessObserver implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-      
+    
         try{
-        $orderIds = $observer->getEvent()->getOrderIds();
-        
-        if (empty($orderIds) || !is_array($orderIds)
-        ) {
+        $order = $observer->getEvent()->getOrder();   
+        $orderId=$order->getIncrementId();
+       if (empty($orderId)) {
+           
             return $this;
         }
 
-        $collection = $this->_orderCollectionFactory->create();
-        $collection->addFieldToFilter('entity_id', ['in' => $orderIds]);
-
-        // Group order items by SKU since Piwik doesn't seem to handle multiple
-        // `addEcommerceItem' with the same SKU.
+        //$collection = $this->_orderCollectionFactory->create();
+        //$collection->addFieldToFilter('entity_id', ['in' => $orderId]);
         $betaoutItems = [];
-        // Aggregate all placed orders into one since Piwik seems to only
-        // register one `trackEcommerceOrder' per request. (For multishipping)
         $betaoutOrder = [];
         $i=0;
         $data=array();
-        foreach ($collection as $order) {
-            $billingAddress=$order->getBillingAddress();
+        $billingAddress=$order->getShippingAddress();
          
          if (is_object($billingAddress)) {
                     $data['email']=$billingAddress->getEmail();
@@ -117,10 +110,7 @@ class CheckoutSuccessObserver implements ObserverInterface
                     $person['city'] = $billingAddress->getCity();
                     $person['fax'] = $billingAddress->getfax();
                     $person['company'] = $billingAddress->getCompany();
-                    $person['dob'] = $order->getCustomerDob();
                     $person['street'] = $billingAddress->getStreetFull();
-                    $person['ip'] = $order->getRemoteIp();
-                    $person['gender']=$order->getCustomerGender();
                     try {
                      $data=  array_filter($data);
                      $result=$this->_betaoutTracker->identify($data);
@@ -130,16 +120,13 @@ class CheckoutSuccessObserver implements ObserverInterface
                    $properties['update']=$person;
                  $result = $this->_betaoutTracker->userProperties($data, $properties);
              }
-            /* @var $order \Magento\Sales\Model\Order */
             foreach ($order->getAllItems() as $item) {
-                /* @var $item \Magento\Sales\Model\Order\Item */
                $product=$item->getProduct();
                $newProduct=self::loadMyProduct($product->getSku());
                if($newProduct->getTypeId()=="configurable" || $newProduct->getTypeId()=="grouped" || $newProduct->getTypeId()=="bundle"){
                 continue;
                }
                $productName = $newProduct->getName();
-               
                $catCollection = $product->getCategoryCollection();
                $categs = $catCollection->exportToArray();
 
@@ -160,25 +147,30 @@ class CheckoutSuccessObserver implements ObserverInterface
                 if($pprice==0){
                  $pprice=(float) $item->getBasePriceInclTax();
                 }
-                
+                $id   = $item->getProductId();
+                $gid=$id;
+                $gname=$product->getName();
+                if($id==$newProduct->getId()){
+                    $gid=0;
+                    $gname="";
+                }
                 $sku   = $item->getSku();
                 $name  = $item->getName();
                 $qty   = (float) $item->getQtyOrdered();
                 
                 $betaoutItems[$i]["id"] = $newProduct->getId();
                 $betaoutItems[$i]["sku"] = $sku;
-                $betaoutItems[$i]["name"]= $newProduct->getName();
+                $betaoutItems[$i]["name"]=$newProduct->getName();
                 $betaoutItems[$i]["price"]=$pprice;
                 $betaoutItems[$i]["quantity"]=$qty;
                 $betaoutItems[$i]['image_url'] = $this->_dataHelper->getMediaBaseUrl().$newProduct->getImage();
                 $betaoutItems[$i]['categories'] = $cateHolder;
                 $betaoutItems[$i]['currency'] = $this->_storeManager->getStore()->getCurrentCurrencyCode();
-                
-                
+               
                 $i++;
+             
              }
 
-            $orderId    = $order->getIncrementId();
             $grandTotal = (float) $order->getBaseGrandTotal();
             $subTotal   = (float) $order->getBaseSubtotalInclTax();
             $tax        = (float) $order->getBaseTaxAmount();
@@ -192,18 +184,15 @@ class CheckoutSuccessObserver implements ObserverInterface
             $betaoutOrder["shipping"] = $shipping;
             $betaoutOrder["discount"] = $discount;
             $betaoutOrder['currency']= $this->_storeManager->getStore()->getCurrentCurrencyCode();
-        }
-
-        // Push `trackEcommerceOrder'
+    
         if (!empty($betaoutOrder)) {
             $actionDescription = array(
-                'activity_type' => 'purchase',
+                'activity_type' => 'order_refunded',
                 "identifiers" =>$data,
                 'products' => $betaoutItems,
                 'order_info' => $betaoutOrder,
             );
-           
-          $result=$this->_betaoutTracker->customer_action($actionDescription);
+         $result=$this->_betaoutTracker->customer_action($actionDescription);
         }
         
         return $this;

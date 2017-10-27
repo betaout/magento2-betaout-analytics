@@ -37,6 +37,6 @@ $customerSession = $om->get('Magento\Customer\Model\Session');
              $product=$block->getCurrentProduct();
               $cats = $product->getCategoryIds();
              ?>
-            _bout.push(["identify", {"customer_id":"<?php echo $customerSession->getCustomer()->getId()?>","email":"<?php echo $customerSession->getCustomer()->getEmail()?>"},{productId:"<?php echo $product->getId()?>",categoryId:"<?php echo $cats[0]?>",brandName:""} ]);
+            _bout.push(["identify", {"customer_id":"","email":""},{productId:"<?php echo $product->getId()?>",categoryId:"<?php echo $cats[0]?>",brandName:""} ]);
       
 </script>

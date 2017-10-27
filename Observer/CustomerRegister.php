@@ -53,6 +53,7 @@ class CustomerRegister implements ObserverInterface
         $data['email']=$customer->getEmail();
         $data['customer_id']=$customer->getId();
         try {
+         
         $ndata=  array_filter($data);
         $this->_betaoutTracker->identify($ndata);
         }catch (Exception $ex) {

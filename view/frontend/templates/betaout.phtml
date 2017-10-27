@@ -22,7 +22,7 @@
 <?php /* @var $block \Betaout\Analytics\Block\Betaout */ ?>
 <?php
 $om = \Magento\Framework\App\ObjectManager::getInstance();
-$customerSession = $om->get('Magento\Customer\Model\Session');
+$customerSession = $om->create('Magento\Customer\Model\Session');
 ?>
  <script type="text/javascript">
             var _bout = _bout || [];
@@ -33,5 +33,5 @@ $customerSession = $om->get('Magento\Customer\Model\Session');
             _sc.async = true;
             _sc.src = "//d22vyp49cxb9py.cloudfront.net/jal-v2.min.js";
             f.parentNode.insertBefore(_sc, f);
-            _bout.push(["identify", {"customer_id":"<?php echo $customerSession->getCustomer()->getId()?>","email":"<?php echo $customerSession->getCustomer()->getEmail()?>"},{productId:"0",categoryId:"0",brandName:""} ]);
+            _bout.push(["identify", {"customer_id":"","email":""},{productId:"0",categoryId:"0",brandName:""} ]);
 </script>

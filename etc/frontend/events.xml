@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Copyright 2016 Betaout Analytics
+ * Copyright 2016 Betaout
  *
  * This file is part of Betaout_Analytics.
  *
- * Henhed_Piwik is free software: you can redistribute it and/or modify
+ * Betaout_Analytics is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -37,14 +37,6 @@
          <observer name="betaout_observer"
                   instance="Betaout\Analytics\Observer\ProductRemoveCartObserver" />
     </event>
-    <event name="checkout_onepage_controller_success_action">
-        <observer name="betaout_observer"
-                  instance="Betaout\Analytics\Observer\CheckoutSuccessObserver" />
-    </event>
-    <event name="multishipping_checkout_controller_success_action">
-        <observer name="betaout_observer"
-                  instance="Betaout\Analytics\Observer\CheckoutSuccessObserver" />
-    </event>
     <event name="customer_login">
         <observer name="betaout_observer"
                   instance="Betaout\Analytics\Observer\CustomerLogin" />
@@ -53,4 +45,17 @@
         <observer name="betaout_observer"
                   instance="Betaout\Analytics\Observer\CustomerRegister" />
     </event>
+    <event name="checkout_onepage_controller_success_action">
+        <observer name="betaout_observer"
+                  instance="Betaout\Analytics\Observer\CheckoutSuccessObserver" />
+    </event>
+    <event name="multishipping_checkout_controller_success_action">
+        <observer name="betaout_observer"
+                  instance="Betaout\Analytics\Observer\CheckoutSuccessObserver" />
+    </event>
+     <event name="sales_order_place_after">
+        <observer name="betaout_observer"
+                  instance="Betaout\Analytics\Observer\OrderPlacedObserver" />
+    </event>
+    
 </config>

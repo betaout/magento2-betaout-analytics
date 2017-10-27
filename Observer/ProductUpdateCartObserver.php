@@ -52,17 +52,23 @@ class ProductUpdateCartObserver implements ObserverInterface
 
     protected $_storeManager;
     protected $_checkoutSession;
+    protected $_productRepository;
+    protected $_request;
     
     public function __construct(
         \Betaout\Analytics\Model\Tracker $betaoutTracker,
         \Betaout\Analytics\Helper\Data $dataHelper,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Checkout\Model\Session $checkoutSession
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Magento\Framework\App\RequestInterface $request
     ) {
         $this->_betaoutTracker = $betaoutTracker;
         $this->_dataHelper = $dataHelper;
         $this->_storeManager = $storeManager;
         $this->_checkoutSession = $checkoutSession;
+        $this->_productRepository=$productRepository;
+        $this->_request=$request;
     }
 
     /**
@@ -74,27 +80,54 @@ class ProductUpdateCartObserver implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
      try{
-        
-         $subdiff=0;
+        $subdiff=0;
         $actionData = array();
         $cartInfo=array();
         $i=0;
-       foreach ($observer->getCart()->getQuote()->getAllVisibleItems() as $product) {
-      
-        /* @var $product \Magento\Catalog\Model\Product */
-            if($product->hasDataChanges()) {
-             $actionData[$i]['id'] = $product->getProductId();
-             $actionData[$i]['name'] = $product->getName();
-             $actionData[$i]['sku'] = $product->getSku();
-             $actionData[$i]['price'] = $product->getPrice();
-             $actionData[$i]['currency'] = $this->_storeManager->getStore()->getCurrentCurrencyCode();
-             $actionData[$i]['quantity']=$product->getQty();
-             $oldQty = (int) $product->getOrigData('qty');
-             $newQty = (int) $product->getQty();
-             $qtyDiff = 0;
-              $subdiff = $subdiff + ($newQty - $oldQty) * $product->getPrice();
-              $i++;
-            }
+       foreach ($observer->getCart()->getQuote()->getAllItems() as $product) {
+           if ($product->hasDataChanges()) {
+                    $productId = $product->getProductId();
+                    $pproduct=self::getProductById($productId);
+                    $newproduct=$product;
+                    $pid=0;
+                    $pname="";
+                   if($pproduct->getTypeID()!="bundle"){
+                     $newproduct= self::loadMyProduct($product->getSku());
+                     $pid=$newproduct->getId();
+                     $pname=$newproduct->getName();
+                    $actionData[$i]['id'] =$pid;
+                    $actionData[$i]['name'] = $pname;
+                    $actionData[$i]['sku'] = $product->getSku();
+                    $actionData[$i]['price'] = $product->getPrice();
+                    $actionData[$i]['currency'] = $this->_storeManager->getStore()->getCurrentCurrencyCode();
+                    $oldQty = (int) $product->getOrigData('qty');
+                    $newQty = (int) $product->getQty();
+                    $qtyDiff = 0;
+                    $subdiff = $subdiff + ($newQty - $oldQty) * $product->getPrice();
+                    $actionData[$i]['quantity'] = (int) $product->getQty();
+                    $i++;
+                    }else{
+                        $pdata=$product->getData();
+                        $removeArray=$pdata['qty_options'];
+                        foreach($removeArray as $radat=>$val){
+                         $newproduct= self::getProductById($radat);
+                         $actionData[$i]['id'] =$newproduct->getId();
+                         $actionData[$i]['name'] =$newproduct->getName();
+                         $actionData[$i]['sku'] = $newproduct->getSku();
+                         $actionData[$i]['price'] = $newproduct->getPrice();
+                         $actionData[$i]['currency'] = $this->_storeManager->getStore()->getCurrentCurrencyCode();
+                         $oldQty = (int) $product->getOrigData('qty');
+                         $newQty = (int) $product->getQty();
+                         $qtyDiff = 0;
+                         $subdiff = $subdiff + ($newQty - $oldQty) * $product->getPrice();
+                         $actionData[$i]['quantity'] = (int) $product->getQty();
+                         $i++;
+                        }
+                        
+                    }
+                    
+                   
+                    }
          }
         $userdata=$this->_dataHelper->getCustomerIdentity();
         $quote = $this->_checkoutSession->getQuote();
@@ -110,7 +143,15 @@ class ProductUpdateCartObserver implements ObserverInterface
         
         $this->_betaoutTracker->customer_action($actionDescription);
         }catch(Exception $ex){
-         
+          
         }
+    }
+    public function getProductById($id)
+    {
+        return $this->_productRepository->getById($id);
+    }
+    public function loadMyProduct($sku)
+    { 
+        return $this->_productRepository->get($sku);
     }
 }

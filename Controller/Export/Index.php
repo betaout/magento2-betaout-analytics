@@ -1,33 +1,33 @@
 <?php
 namespace Betaout\Analytics\Controller\Export;
-use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\App\Action\Context;
 class Index extends \Magento\Framework\App\Action\Action
 {
-    protected $pageFactory;
-    protected $_orderCollectionFactory;
+    protected $_dataHelper;
+  
     public function __construct(Context $context,
-                                PageFactory $pageFactory,
-             \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory)
+            \Betaout\Analytics\Helper\Data $dataHelper,
+            \Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory $statusCollectionFactory,
+            array $data = [])
     { 
-        $this->pageFactory = $pageFactory;
-         $this->_orderCollectionFactory =$orderCollectionFactory;
+        $this->_dataHelper = $dataHelper;
+        $this->_statusCollectionFactory=$statusCollectionFactory;
         return parent::__construct($context);
     }
 
     public function execute()
     { 
-        $resultPage = $this->pageFactory->create();
-        return $resultPage;
+     $sapiKey=$this->_dataHelper->getApiKey();
+     $sprojectId=$this->_dataHelper->getProjectId();
+     $options = $this->_statusCollectionFactory->create()->toOptionArray();        
+     $result=array("apiKey"=>$sapiKey,
+                   "projectId"=>$sprojectId,
+                   "status"=>$options,
+                   "responseCode"=>200);
+     echo json_encode($result);
     }
     
     public function getOrderimport(){
-        echo "getorder import";
-        $orders =$this->_orderCollectionFactory->create()
-         ->addFieldToSelect('*')
-         ->setPageSize(10)
-         ->setCurPage(1)
-         ->addAttributeToSelect('entity_id');
-  echo $count=$orders->Count();
+        
     }
 }

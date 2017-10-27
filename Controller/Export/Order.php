@@ -5,16 +5,22 @@ class Order extends \Magento\Framework\App\Action\Action {
   protected $_orderCollectionFactory;
   protected $_storeManager;
   protected $_categoryFactory;
+  protected $_productRepository;
+  protected $_dataHelper;
   
 public function __construct(Context $context,
          \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
          \Magento\Store\Model\StoreManagerInterface $storeManager,
          \Magento\Catalog\Model\CategoryFactory $categoryFactory,
+         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+         \Betaout\Analytics\Helper\Data $dataHelper,
          array $data = []
         ) {
        $this->_orderCollectionFactory =$orderCollectionFactory;
        $this->_storeManager = $storeManager;
        $this->_categoryFactory = $categoryFactory;
+       $this->_productRepository=$productRepository;
+       $this->_dataHelper = $dataHelper;
        parent::__construct($context);
     }
 public function sendData($data) {
@@ -43,6 +49,20 @@ public function sendData($data) {
    public function execute()
     {
     try{
+    $sapiKey=$this->_dataHelper->getApiKey();
+    $sprojectId=$this->_dataHelper->getProjectId();
+    $key=isset($_GET['apiKey'])?$_GET['apiKey']:"";
+    $projectId=isset($_GET['projectId'])?$_GET['projectId']:"";
+    if($key=="" || $projectId==""){
+     $result=array("error"=>"Api key and ProjectId required","responseCode"=>500);
+      echo json_encode($result);
+      die();
+    }
+    if($key!=$sapiKey || $projectId!=$sprojectId){
+     $result=array("error"=>"Api key and ProjectId Not Matched","responseCode"=>500);
+      echo json_encode($result);
+      die();
+    }
     $status=isset($_GET['status'])?$_GET['status']:"complete";
     $cpage=isset($_GET['pageNo'])?$_GET['pageNo']:1;
     $limit = isset($_GET['limit']) ? $_GET['limit'] : 50;
@@ -59,14 +79,13 @@ public function sendData($data) {
          ->addFieldToSelect('*')
          ->addFieldToFilter('status',$status) 
          ->setPageSize($limit);
-     $lpages = $orders->getLastPageNumber();
-     $orders->setCurPage($cpage);
+      $lpages = $orders->getLastPageNumber();
+      $orders->setCurPage($cpage);
  $count=$orders->Count();
  $ordata=array();
  $j=0;
   if($count){
        foreach ($orders as $order)  {
-          
                 $orderId = $order->getId();
                 $order_id = $order->getIncrementId();
                 $email=  $order->getData('customer_email');
@@ -84,7 +103,33 @@ public function sendData($data) {
                 $i = 0;
                 $actionData = array();
                 foreach ($order->getAllVisibleItems() as $item) {
-                     $product=$item->getProduct();
+                   $product=$item->getProduct();
+                   $newProduct=self::loadMyProduct($product->getSku());
+                   $productName = $newProduct->getName();
+                    $attributes = $newProduct->getAttributes();
+                    $attrArray=array();
+                     foreach ($attributes as $attribute) { 
+                             if($attribute->getIsUserDefined()){
+                             $acode=$attribute->getAttributeCode();
+                             $attributeLabel = $attribute->getFrontendLabel();
+                             $value = $attribute->getFrontend()->getValue($newProduct);
+
+                             if (!$product->hasData($attribute->getAttributeCode())) {
+                                     $value ="";
+                                 } elseif ((string)$value == '') {
+                                     $value = "";
+                                 } elseif ($attribute->getFrontendInput() == 'price' && is_string($value)) {
+                                     $value =$value;
+                                 } elseif ($value instanceof Phrase) {
+                                     $value = $value->getText();
+                                 }
+
+                                 if (is_string($value) && strlen($value)) {
+                                   $attrArray[$attribute->getAttributeCode()]=$value;   
+                                 }
+                            }
+
+                       }
                    $catCollection = $product->getCategoryCollection();
                     $categs = $catCollection->exportToArray();
 
@@ -101,17 +146,31 @@ public function sendData($data) {
                           $cateHolder[] = array("cat_id"=>$id,"cat_name" => $name, "parent_cat_id" => $pid);
                         }
                      }
-
-                    $actionData[$i]['id'] = $product->getId();
-                    $actionData[$i]['name'] = $product->getName();
-                    $actionData[$i]['sku'] = $product->getSku();
-                    $actionData[$i]['price'] = $product->getPrice();
-                    $actionData[$i]['currency'] =$this->_storeManager->getStore()->getCurrentCurrency()->getCode();
-                    $actionData[$i]['image_url'] = $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)."catalog/product".$product->getImage();
-                    $actionData[$i]['product_url'] = $product->getProductUrl();
-                    $actionData[$i]['brandname'] = $product->getResource()->getAttribute('manufacturer') ? $product->getAttributeText('manufacturer') : false;
-                    $actionData[$i]['quantity'] = (int) $item->getQtyOrdered();
-                    $actionData[$i]['categories'] = $cateHolder;
+                   $pprice=$newProduct->getFinalPrice();
+                    if($pprice==0){
+                     $pprice=(float) $item->getBasePriceInclTax();
+                    }
+                    $id   = $item->getProductId();
+                    $gid=$id;
+                    $gname=$product->getName();
+                    if($id==$newProduct->getId()){
+                        $gid=0;
+                        $gname="";
+                    }
+                    $sku   = $item->getSku();
+                    $name  = $item->getName();
+                    $qty   = (float) $item->getQtyOrdered();
+                    $betaoutItems[$i]['product_group_id']=$gid;
+                    $betaoutItems[$i]['product_group_name']=$gname;
+                    $betaoutItems[$i]["id"] = $id;
+                    $betaoutItems[$i]["sku"] = $sku;
+                    $betaoutItems[$i]["name"]=$name;
+                    $betaoutItems[$i]["price"]=$pprice;
+                    $betaoutItems[$i]["quantity"]=$qty;
+                    $betaoutItems[$i]['image_url'] = $this->_dataHelper->getMediaBaseUrl().$newProduct->getImage();
+                    $betaoutItems[$i]['categories'] = $cateHolder;
+                    $betaoutItems[$i]['currency'] = $this->_storeManager->getStore()->getCurrentCurrencyCode();
+                    $betaoutItems[$i]['specs']=$attrArray;
                    
                     $i++;
                 }
@@ -119,7 +178,6 @@ public function sendData($data) {
               
                 $TotalPrice = $order->getGrandTotal();
                 $totalShippingPrice = $order->getShippingInclTax();
-             
                 $subTotalPrice = $order->getSubtotal();
                 $orderInfo["revenue"] = $subTotalPrice - abs($order->getDiscountAmount());
                 $orderInfo["total_price"] = $TotalPrice;
@@ -133,7 +191,6 @@ public function sendData($data) {
                 $orderInfo['payment_method']= $order->getPayment()->getMethodInstance()->getTitle();;  
                 $orderInfo['products']=$actionData; 
                 $orderInfo['created_time']=strtotime($order->getData('created_at'));
-                
                 $actionDescription = array(
                     'identifiers' => $data,
                     'properties' => $orderInfo
@@ -161,5 +218,9 @@ public function sendData($data) {
    }
        
     }
+    public function loadMyProduct($sku)
+{ 
+    return $this->_productRepository->get($sku);
+}
 
 }

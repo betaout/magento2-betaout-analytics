@@ -104,7 +104,7 @@ public function sendData($data){
             }
             }
         } catch (Exception $ex) {
-            print_r($ex);
+          
         }
     }
 

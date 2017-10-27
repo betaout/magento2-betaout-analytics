@@ -52,16 +52,22 @@ class ProductRemoveCartObserver implements ObserverInterface
 
     protected $_storeManager;
     protected $_checkoutSession;
+    protected $_productRepository;
+    protected $_request;
     public function __construct(
         \Betaout\Analytics\Model\Tracker $betaoutTracker,
         \Betaout\Analytics\Helper\Data $dataHelper,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Checkout\Model\Session $checkoutSession
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Magento\Framework\App\RequestInterface $request
     ) {
         $this->_betaoutTracker = $betaoutTracker;
         $this->_dataHelper = $dataHelper;
         $this->_storeManager = $storeManager;
         $this->_checkoutSession = $checkoutSession;
+        $this->_productRepository =$productRepository;
+        $this->_request=$request;
     }
 
     /**
@@ -73,16 +79,42 @@ class ProductRemoveCartObserver implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
     try{
-       
         $product = $observer->getEvent()->getQuote_item();
+           
         $actionData = array();
-        $cartInfo=array();
-        $actionData[0]['id'] = $product->getProductId();
-        $actionData[0]['name'] = $product->getName();
+        $productId = $product->getProductId();
+        $pproduct=self::getProductById($productId);
+        $newproduct=$product;
+        if($pproduct->getTypeID()!="bundle"){
+        $newproduct= self::loadMyProduct($product->getSku());
+        $pid=$newproduct->getId();
+        $pname=$newproduct->getName();
+        $actionData[0]['id'] =$pid;
+        $actionData[0]['name'] = $pname;
         $actionData[0]['sku'] = $product->getSku();
         $actionData[0]['price'] = $product->getPrice();
         $actionData[0]['currency'] = $this->_storeManager->getStore()->getCurrentCurrencyCode();
         $actionData[0]['quantity']=$product->getQty();
+        $subprice = (float) $product->getQty() * $product->getPrice();
+        }else{
+           $pdata=$product->getData();
+           $removeArray=$pdata['qty_options'];
+           $i=0;
+           foreach($removeArray as $radat=>$val){
+            $newproduct= self::getProductById($radat);
+            $actionData[$i]['id'] =$newproduct->getId();
+            $actionData[$i]['name'] =$newproduct->getName();
+            $actionData[$i]['sku'] = $newproduct->getSku();
+            $actionData[$i]['price'] = $newproduct->getPrice();
+            $actionData[$i]['currency'] = $this->_storeManager->getStore()->getCurrentCurrencyCode();
+            $actionData[$i]['quantity']=$product->getQty();
+            $i++;
+           }
+           
+        }
+        
+    
+        $cartInfo=array();
         $subprice = (float) $product->getQty() * $product->getPrice();
         $userdata=$this->_dataHelper->getCustomerIdentity();
         $quote = $this->_checkoutSession->getQuote();
@@ -98,7 +130,15 @@ class ProductRemoveCartObserver implements ObserverInterface
        
         $this->_betaoutTracker->customer_action($actionDescription);
         }catch(Exception $ex){
-       
+         
         }
+    }
+    public function getProductById($id)
+    {
+        return $this->_productRepository->getById($id);
+    }
+    public function loadMyProduct($sku)
+    { 
+        return $this->_productRepository->get($sku);
     }
 }
