@@ -27,7 +27,6 @@ class Customer extends \Magento\Framework\App\Action\Action {
         $url="https://api.betaout.com/v2/bulk/users/";
         $sdata['apikey']=$key;
         $sdata['project_id']=$projectId;
-        $sdata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
         $sdata['users']=$data;
         $jdata = json_encode($sdata);
         $curl = curl_init($url);
