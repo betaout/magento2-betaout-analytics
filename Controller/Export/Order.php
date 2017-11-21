@@ -101,7 +101,7 @@ public function sendData($data) {
                 $items = $order->getAllVisibleItems();
                 $itemcount = count($items);
                 $i = 0;
-                $actionData = array();
+                $betaoutItems = array();
                 foreach ($order->getAllVisibleItems() as $item) {
                    $product=$item->getProduct();
                    $newProduct=self::loadMyProduct($product->getSku());
@@ -189,7 +189,7 @@ public function sendData($data) {
                 $orderInfo['order_status'] = $status;
                 $orderInfo['taxes'] = $order->getShippingTaxAmount();
                 $orderInfo['payment_method']= $order->getPayment()->getMethodInstance()->getTitle();;  
-                $orderInfo['products']=$actionData; 
+                $orderInfo['products']=$betaoutItems; 
                 $orderInfo['created_time']=strtotime($order->getData('created_at'));
                 $actionDescription = array(
                     'identifiers' => $data,
